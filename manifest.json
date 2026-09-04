@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "FPL Ballknower",
+  "version": "1.0",
+  "description": "Adds transfers, free transfers, hits, and a player highlight filter to FPL mini-league standings.",
+  "content_scripts": [
+    {
+      "matches": ["https://fantasy.premierleague.com/*leagues/*/standings/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
