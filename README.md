@@ -1,84 +1,85 @@
 # FPL Ballknower
 
-A small browser extension that adds extra detail to the [Fantasy Premier League](https://fantasy.premierleague.com) mini-league standings page:
+A browser extension for Fantasy Premier League mini-league standings. Adds:
 
-- **Transfers made** this gameweek, shown under each manager's name (with a hover tooltip if they made more than 4 — handy for wildcard/free hit weeks)
-- **Free transfers remaining** and **points lost to hits**, estimated per manager
-- **Highlight filter** — pick any player from your league and a filter (Owned / Captained / Benched / Started) to instantly see which teams match
+- Each manager's transfers for the current gameweek (hover for full list if they made more than 4)
+- Estimated free transfers remaining and points lost to hits
+- A player filter with dropdowns for Owned / Captained / Benched / Started, which highlights matching teams in the table
 
-It works entirely in your browser. No login, no data collection, no server — it just reads the same public FPL data your browser already has access to and adds it to the page.
-
-## Screenshots
-
-*(add a screenshot or two here once you've got one you like)*
+Runs entirely in your browser. No login, no tracking, no server. It just reads the same public FPL API data your browser already loads.
 
 ## Installation
 
 ### Firefox
 
-FPL Ballknower is signed by Mozilla, so installing it is a completely normal, permanent install — no developer settings needed.
+Signed by Mozilla, so it installs and stays installed like any normal add-on.
 
-1. Download the latest `.xpi` file from this repo's [Releases page](../../releases).
-   - **Note:** clicking a `.xpi` link in Firefox normally triggers an install prompt directly (rather than downloading a file) — that's fine and expected, just click through it. If you specifically want to save the file first, right-click the link and choose "Save Link As…" instead.
-2. If you downloaded the file rather than installing directly, drag the `.xpi` file into a Firefox window.
-3. Click **Add** on the prompt that appears.
-4. Done — it's installed permanently, just like any add-on from the official store.
+1. Grab the latest `.xpi` from [Releases](../../releases).
+2. Clicking the link in Firefox will prompt an install directly. If you want to save the file first instead, right-click the link and choose "Save Link As…".
+3. If you downloaded it, drag the `.xpi` into a Firefox window.
+4. Click Add.
 
-### Tampermonkey (works in Firefox, Chrome, Edge, Brave, etc.)
+### Chrome / Edge / Brave
 
-If you don't want to install a dedicated extension, the same functionality is available as a userscript for [Tampermonkey](https://www.tampermonkey.net/), which works across basically every browser.
+Not on the Chrome Web Store (the $25 developer fee isn't worth it for a hobby project). Install manually instead:
 
-1. Install the Tampermonkey extension for your browser from the link above.
-2. Click the Tampermonkey icon in your toolbar → **Create a new script**.
-3. Delete the placeholder content and paste in the contents of [`content.js`](./content.js) from this repo, wrapped with a userscript header like this at the very top:
+1. Download the zip from [Releases](../../releases) and unzip it somewhere you won't delete.
+2. Go to `chrome://extensions` (or the equivalent for your browser).
+3. Turn on Developer mode.
+4. Click Load unpacked, select the unzipped folder.
+
+It'll keep working as long as you don't move or delete that folder.
+
+### Tampermonkey
+
+Works the same in any browser if you'd rather not install a dedicated extension.
+
+1. Install [Tampermonkey](https://www.tampermonkey.net/).
+2. Tampermonkey icon → Create a new script.
+3. Delete the placeholder, paste in [`content.js`](./content.js), and add this header at the top:
 
    ```javascript
    // ==UserScript==
    // @name         FPL Ballknower
    // @namespace    fpl-ballknower
    // @version      1.0
-   // @description  Transfers, free transfers, hits, and player highlight filters for FPL mini-leagues
    // @match        https://fantasy.premierleague.com/*leagues/*/standings/*
    // @grant        none
    // ==/UserScript==
    ```
 
-4. Save (Ctrl+S / Cmd+S).
-5. Go to any FPL mini-league standings page and reload — it should just work.
+4. Save. Reload your league standings page.
 
-### Chrome / Edge / Brave (and other Chromium browsers)
+## Usage
 
-**Not currently available.** FPL Ballknower isn't published on the Chrome Web Store yet. In the meantime, Chromium-browser users can use the [Tampermonkey option](#tampermonkey-works-in-firefox-chrome-edge-brave-etc) above, which works identically.
+Just open your mini-league standings page as normal:
+`fantasy.premierleague.com/leagues/<league-id>/standings/c`
 
-## How to find your league
-
-Once installed (extension or userscript), just browse to your mini-league's standings page as normal:
-`fantasy.premierleague.com/leagues/<your-league-id>/standings/c`
-
-It activates automatically on any page matching that pattern — no setup or configuration needed.
+It runs automatically on any page matching that URL pattern.
 
 ## Updating
 
-- **Firefox extension:** check the [Releases page](../../releases) for newer versions; install the new `.xpi` the same way as above.
-- **Tampermonkey:** re-copy the latest `content.js` into your existing script via Tampermonkey's dashboard.
+- Firefox: check [Releases](../../releases) for a newer `.xpi`.
+- Chrome/Edge/Brave: re-download and re-unzip, then hit the reload icon on `chrome://extensions`.
+- Tampermonkey: paste the updated `content.js` into your existing script.
 
-## What data does this use?
+## Data used
 
-Everything comes from Fantasy Premier League's own public API — the same data your browser already loads when you view the standings page. Specifically:
+All from FPL's public API:
 
 - `bootstrap-static/` — player names and positions
-- `entry/{id}/transfers/` — a manager's transfer history
-- `entry/{id}/history/` — a manager's gameweek-by-gameweek history (for the free-transfer and hits estimate)
-- `entry/{id}/event/{gw}/picks/` — a manager's squad for a given gameweek
+- `entry/{id}/transfers/` — transfer history
+- `entry/{id}/history/` — gameweek history (used for the free transfer / hits estimate)
+- `entry/{id}/event/{gw}/picks/` — squad for a gameweek
 
-No data is sent anywhere else, stored, or tracked. Nothing leaves your browser except the requests to FPL's own API that the page would need anyway.
+Nothing is sent anywhere else or stored.
 
 ## Known limitations
 
-- **Free transfers remaining is an estimate**, not official — the FPL API doesn't expose this number directly, so it's calculated by replaying each gameweek's transfer count and chip usage against FPL's known banking rules. It should be accurate for the vast majority of cases, but if it ever looks off for a specific manager, that's useful to know about (see [Issues](../../issues)).
-- Wildcard/Free Hit weeks can log a lot of intermediate transfer edits in FPL's data (e.g. swapping a player out and back in while building a squad) — this extension nets those out and matches players by position where possible, but very rarely (when a wildcard changes formation shape) it may pair up two different positions.
-- Built and tested against the FPL site's current page structure — if FPL redesigns their standings page, the extension may stop finding the table until it's updated.
+- Free transfers remaining is an estimate, not official data. FPL's API doesn't expose it, so it's calculated by replaying transfer counts and chip usage against the known banking rules. Should be right almost always, but flag it in [Issues](../../issues) if it's ever wrong for someone.
+- Wildcard/Free Hit weeks can log a lot of intermediate transfer edits (swapping a player out and back in while building a squad). This gets netted out and matched by position, but a wildcard that changes formation shape can very rarely produce a mismatched pair.
+- Built against FPL's current page structure. If they redesign the standings page, this will probably break until updated.
 
-## Contributing / issues
+## Issues
 
-Found a bug or have a feature idea? Open an [issue](../../issues) on this repo.
+Bugs or feature requests: open an [issue](../../issues).
