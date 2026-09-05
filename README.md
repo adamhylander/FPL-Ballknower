@@ -25,7 +25,7 @@ Signed by Mozilla, so it installs and stays installed like any normal add-on.
 
 ### Chrome / Edge / Brave
 
-Not on the Chrome Web Store (the $25 developer fee isn't worth it for a hobby project). Install manually instead:
+Brother I am not paying 25 dollars to upload this shit on the Chrome Web Store. If you insist on using a Chromium browser and don't wish to use Tampermonkey then you can install manually instead:
 
 1. Download the zip from [Releases](../../releases) and unzip it somewhere you won't delete.
 2. Go to `chrome://extensions` (or the equivalent for your browser).
