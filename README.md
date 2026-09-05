@@ -9,7 +9,11 @@ A browser extension for Fantasy Premier League mini-league standings. Adds:
 Runs entirely in your browser. No login, no tracking, no server. It just reads the same public FPL API data your browser already loads.
 
 ## Pictures
+Example league showing transfers, remaining free hits and if the player has taken any hits (-4)
 <img width="1360" height="842" alt="bild" src="https://github.com/user-attachments/assets/b507cd25-5b8b-43fc-8e53-50fae4c019f0" />
+
+A really shit wildcard usage
+<img width="506" height="278" alt="bild" src="https://github.com/user-attachments/assets/be8dd876-ee34-4efd-a0de-f74265a1f062" />
 
 
 ## Installation
