@@ -13,9 +13,10 @@ Example league showing transfers, remaining free hits and if the player has take
 
 <img width="1360" height="842" alt="bild" src="https://github.com/user-attachments/assets/b507cd25-5b8b-43fc-8e53-50fae4c019f0" />
 
-A really shit wildcard usage:
+A (probably) really shit wildcard usage:
 
-<img width="506" height="278" alt="bild" src="https://github.com/user-attachments/assets/be8dd876-ee34-4efd-a0de-f74265a1f062" />
+<img width="522" height="262" alt="bild" src="https://github.com/user-attachments/assets/88e7fb56-8637-4a1d-828f-ff040ac47d90" />
+
 
 
 ## Installation
@@ -52,7 +53,7 @@ Works the same in any browser if you'd rather not install a dedicated extension.
    // ==UserScript==
    // @name         FPL Ballknower
    // @namespace    fpl-ballknower
-   // @version      1.0
+   // @version      1.1
    // @match        https://fantasy.premierleague.com/*leagues/*/standings/*
    // @grant        none
    // ==/UserScript==
