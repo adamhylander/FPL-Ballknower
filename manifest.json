@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
   "name": "FPL Ballknower",
-  "version": "1.1",
+  "version": "1.2",
   "description": "Shows each manager's transfers for the current gameweek in your FPL mini-league, plus two dropdown filters to see who owns, started, benched, or captained any given player.",
   "content_scripts": [
     {
-      "matches": ["https://fantasy.premierleague.com/*leagues/*/standings/*"],
+      "matches": ["https://fantasy.premierleague.com/*leagues*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }
