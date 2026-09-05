@@ -8,6 +8,9 @@ A browser extension for Fantasy Premier League mini-league standings. Adds:
 
 Runs entirely in your browser. No login, no tracking, no server. It just reads the same public FPL API data your browser already loads.
 
+## Pictures
+<img width="1338" height="565" alt="bild" src="https://github.com/user-attachments/assets/d71da876-d31b-425f-8c80-cf868dfa494c" />
+
 ## Installation
 
 ### Firefox
