@@ -1,4 +1,4 @@
-# FPL Mini-League Extras
+# FPL Ballknower
 
 A small browser extension that adds extra detail to the [Fantasy Premier League](https://fantasy.premierleague.com) mini-league standings page:
 
@@ -14,45 +14,53 @@ It works entirely in your browser. No login, no data collection, no server — i
 
 ## Installation
 
-This isn't published on the Chrome Web Store or Firefox Add-ons store — you install it directly from this repo. Takes about a minute.
-
 ### Firefox
 
-1. Download this repo: click the green **Code** button above → **Download ZIP**, then unzip it somewhere.
-2. Open Firefox and go to `about:debugging#/runtime/this-firefox`
-3. Click **Load Temporary Add-on…**
-4. Select the `manifest.json` file inside the unzipped folder.
-5. Done — go to any of your FPL mini-league standings pages and it should just work.
+FPL Ballknower is signed by Mozilla, so installing it is a completely normal, permanent install — no developer settings needed.
 
-**Heads up:** Firefox removes "temporary" add-ons when you restart the browser, so you'll need to repeat steps 2–4 each time you restart Firefox. If that gets annoying, there's a way to get a permanently-signed version — see [Notes for Firefox permanence](#notes-for-firefox-permanence) below.
+1. Download the latest `.xpi` file from this repo's [Releases page](../../releases).
+   - **Note:** clicking a `.xpi` link in Firefox normally triggers an install prompt directly (rather than downloading a file) — that's fine and expected, just click through it. If you specifically want to save the file first, right-click the link and choose "Save Link As…" instead.
+2. If you downloaded the file rather than installing directly, drag the `.xpi` file into a Firefox window.
+3. Click **Add** on the prompt that appears.
+4. Done — it's installed permanently, just like any add-on from the official store.
 
-### Chrome (also works for Edge, Brave, and other Chromium browsers)
+### Tampermonkey (works in Firefox, Chrome, Edge, Brave, etc.)
 
-1. Download this repo: click the green **Code** button above → **Download ZIP**, then unzip it somewhere.
-2. Open Chrome and go to `chrome://extensions`
-3. Turn on **Developer mode** (top-right toggle).
-4. Click **Load unpacked**.
-5. Select the unzipped folder (the one containing `manifest.json`).
-6. Done — this one *does* stay installed permanently, as long as Developer mode stays on and you don't delete the folder (Chrome loads the extension from that folder each time, it doesn't copy it).
+If you don't want to install a dedicated extension, the same functionality is available as a userscript for [Tampermonkey](https://www.tampermonkey.net/), which works across basically every browser.
+
+1. Install the Tampermonkey extension for your browser from the link above.
+2. Click the Tampermonkey icon in your toolbar → **Create a new script**.
+3. Delete the placeholder content and paste in the contents of [`content.js`](./content.js) from this repo, wrapped with a userscript header like this at the very top:
+
+   ```javascript
+   // ==UserScript==
+   // @name         FPL Ballknower
+   // @namespace    fpl-ballknower
+   // @version      1.0
+   // @description  Transfers, free transfers, hits, and player highlight filters for FPL mini-leagues
+   // @match        https://fantasy.premierleague.com/*leagues/*/standings/*
+   // @grant        none
+   // ==/UserScript==
+   ```
+
+4. Save (Ctrl+S / Cmd+S).
+5. Go to any FPL mini-league standings page and reload — it should just work.
+
+### Chrome / Edge / Brave (and other Chromium browsers)
+
+**Not currently available.** FPL Ballknower isn't published on the Chrome Web Store yet. In the meantime, Chromium-browser users can use the [Tampermonkey option](#tampermonkey-works-in-firefox-chrome-edge-brave-etc) above, which works identically.
 
 ## How to find your league
 
-Once installed, just browse to your mini-league's standings page as normal:
+Once installed (extension or userscript), just browse to your mini-league's standings page as normal:
 `fantasy.premierleague.com/leagues/<your-league-id>/standings/c`
 
-The extension activates automatically on any page matching that pattern — no setup or configuration needed.
+It activates automatically on any page matching that pattern — no setup or configuration needed.
 
 ## Updating
 
-Since this isn't on an extension store, updates don't happen automatically. To get the latest version:
-
-1. Download the new ZIP from this repo (or `git pull` if you cloned it).
-2. **Firefox:** repeat the "Load Temporary Add-on" steps.
-3. **Chrome:** go to `chrome://extensions`, find the extension, and click the refresh/reload icon — no need to remove and re-add it, as long as it's pointing at the same folder you just updated.
-
-## Notes for Firefox permanence
-
-Firefox requires extensions to be signed by Mozilla to install permanently, even for private use — this is a Firefox platform restriction, not something specific to this extension. If you want to skip re-loading it after every restart, you (or whoever maintains this repo) can submit it for signing at [addons.mozilla.org/developers](https://addons.mozilla.org/developers/) as an **unlisted** add-on. That skips public store review and just hands back a signed `.xpi` file, which installs permanently and isn't searchable by anyone else. This is free and only needs to be done once per version.
+- **Firefox extension:** check the [Releases page](../../releases) for newer versions; install the new `.xpi` the same way as above.
+- **Tampermonkey:** re-copy the latest `content.js` into your existing script via Tampermonkey's dashboard.
 
 ## What data does this use?
 
