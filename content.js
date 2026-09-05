@@ -1,12 +1,3 @@
-// ==UserScript==
-// @name         FPL Mini-League Transfers + Player Filter
-// @namespace    fpl-transfers-column
-// @version      1.9
-// @description  Shows net transfers, FT/hits, and dropdowns to highlight owners/captains/bench/starters of a player
-// @match        https://fantasy.premierleague.com/*leagues/*/standings/*
-// @grant        none
-// ==/UserScript==
-
 (function () {
   'use strict';
 
@@ -21,21 +12,48 @@
   let selectedType = 'owned';
   let dropdownBuilt = false;
 
-  // --- tooltip ---
+  // --- theme helpers ---
+  function getBgColor(el) {
+    let node = el;
+    while (node && node !== document.documentElement) {
+      const bg = getComputedStyle(node).backgroundColor;
+      if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') return bg;
+      node = node.parentElement;
+    }
+    return getComputedStyle(document.body).backgroundColor || 'rgb(255,255,255)';
+  }
+
+  function relativeLuminance(rgbStr) {
+    const nums = (rgbStr.match(/[\d.]+/g) || [255, 255, 255]).map(Number);
+    const [r, g, b] = nums;
+    const a = [r, g, b].map(v => {
+      v /= 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+  }
+
+  function isLightBg(rgbStr) {
+    return relativeLuminance(rgbStr) > 0.5;
+  }
+
+  // --- tooltip, built theme-aware on first use ---
   let tooltip = null;
-  function ensureTooltip() {
+  function ensureTooltip(refEl) {
     if (tooltip) return tooltip;
+    const light = isLightBg(getBgColor(refEl || document.body));
+
     tooltip = document.createElement('div');
     tooltip.style.position = 'fixed';
     tooltip.style.zIndex = '99999';
-    tooltip.style.background = '#1a0e2e';
-    tooltip.style.border = '1px solid #7b5cff';
+    tooltip.style.background = light ? '#ffffff' : '#1a0e2e';
+    tooltip.style.color = light ? '#111111' : '#ffffff';
+    tooltip.style.border = light ? '1px solid rgba(0,0,0,0.2)' : '1px solid #7b5cff';
     tooltip.style.borderRadius = '6px';
     tooltip.style.padding = '8px 10px';
     tooltip.style.fontSize = '12px';
-    tooltip.style.color = '#fff';
     tooltip.style.maxWidth = '260px';
-    tooltip.style.boxShadow = '0 4px 12px rgba(0,0,0,0.5)';
+    tooltip.style.boxShadow = light ? '0 4px 12px rgba(0,0,0,0.15)' : '0 4px 12px rgba(0,0,0,0.5)';
     tooltip.style.display = 'none';
     tooltip.style.pointerEvents = 'none';
     tooltip.style.lineHeight = '1.5';
@@ -43,8 +61,9 @@
     document.body.appendChild(tooltip);
     return tooltip;
   }
+
   function showTooltip(el, text) {
-    const tip = ensureTooltip();
+    const tip = ensureTooltip(el);
     tip.textContent = text;
     tip.style.display = 'block';
     const rect = el.getBoundingClientRect();
@@ -170,7 +189,8 @@
     bucket[playerId].add(entryId);
   }
 
-  function styledSelectWithArrow() {
+  // --- dropdown styling, pulled from the real "Report Offensive Name" button ---
+  function styledSelectWithArrow(refButton) {
     const holder = document.createElement('div');
     holder.style.position = 'relative';
     holder.style.display = 'inline-flex';
@@ -178,16 +198,20 @@
     holder.style.alignSelf = 'center';
     holder.style.height = '42px';
 
+    const refStyle = refButton ? getComputedStyle(refButton) : null;
+    const borderColor = refStyle ? refStyle.borderColor : 'rgba(128,128,128,0.5)';
+    const textColor = refStyle ? refStyle.color : '#111';
+
     const select = document.createElement('select');
     select.style.boxSizing = 'border-box';
     select.style.height = '42px';
-    select.style.lineHeight = '40px'; // slightly less than height to account for border
+    select.style.lineHeight = '40px';
     select.style.padding = '0 34px 0 16px';
     select.style.margin = '0';
     select.style.borderRadius = '999px';
     select.style.background = 'transparent';
-    select.style.color = '#fff';
-    select.style.border = '1px solid rgba(255,255,255,0.5)';
+    select.style.color = textColor;
+    select.style.border = `1px solid ${borderColor}`;
     select.style.fontSize = '14px';
     select.style.fontFamily = 'inherit';
     select.style.fontWeight = '600';
@@ -198,7 +222,7 @@
     select.style.mozAppearance = 'none';
     select.style.verticalAlign = 'middle';
     select.addEventListener('mouseenter', () => { select.style.borderColor = '#00ff87'; });
-    select.addEventListener('mouseleave', () => { select.style.borderColor = 'rgba(255,255,255,0.5)'; });
+    select.addEventListener('mouseleave', () => { select.style.borderColor = borderColor; });
 
     const arrow = document.createElement('span');
     arrow.style.position = 'absolute';
@@ -208,11 +232,10 @@
     arrow.style.height = '0';
     arrow.style.borderLeft = '5px solid transparent';
     arrow.style.borderRight = '5px solid transparent';
-    arrow.style.borderTop = '6px solid #fff';
+    arrow.style.borderTop = `6px solid ${textColor}`;
     arrow.style.opacity = '0.85';
     arrow.style.pointerEvents = 'none';
-    arrow.style.marginTop = '-3px'; // half the arrow's own height, since translateY interacts oddly with top:50% on some engines
-    arrow.style.transform = 'translateY(0)';
+    arrow.style.marginTop = '-3px';
 
     holder.appendChild(select);
     holder.appendChild(arrow);
@@ -279,9 +302,7 @@
 
     dropdownBuilt = true;
   }
-  // Player list is always drawn from the full "owned" set, so switching the
-  // type dropdown never removes an already-selected player from the list —
-  // the count shown just reflects how many match the current type (can be 0).
+
   function populateDropdown() {
     const select = document.getElementById('fpl-player-filter');
     if (!select) return;
@@ -303,8 +324,6 @@
       select.appendChild(opt);
     });
 
-    // Selection now always persists across type changes, since every owned
-    // player stays in the list regardless of the current filter type.
     if (previousValue) {
       select.value = previousValue;
       selectedPlayerId = Number(previousValue);
@@ -375,10 +394,12 @@
       const nameBlock = cell.querySelector('div._4xqwov0');
       if (!nameBlock) continue;
 
+      // No hardcoded color here — inherits FPL's own text color for this
+      // area, so it automatically matches light or dark theme correctly.
       const line = document.createElement('div');
       line.className = 'fpl-tx-line';
       line.style.fontSize = '11px';
-      line.style.opacity = '0.7';
+      line.style.opacity = '0.75';
       line.style.marginTop = '2px';
       line.style.whiteSpace = 'normal';
       line.textContent = '…';
@@ -387,7 +408,7 @@
       const metaLine = document.createElement('div');
       metaLine.className = 'fpl-meta-line';
       metaLine.style.fontSize = '10px';
-      metaLine.style.opacity = '0.55';
+      metaLine.style.opacity = '0.6';
       metaLine.style.marginTop = '1px';
       nameBlock.appendChild(metaLine);
 
